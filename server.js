@@ -5,6 +5,8 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
+const lambda = new AWS.Lambda();
+const { getDataFromDynamoDB } = require('./service');
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -21,16 +23,50 @@ app.listen(port, () => {
 });
 const apiUrl = 'https://e8oka0ryae.execute-api.eu-north-1.amazonaws.com/Demo';
 
-app.get('/api/data', async (req, res) => {
-  
+/* app.get('/api/data', async (req, res) => {
+  console.log('Accessing /api/data endpoint'); 
   try {
-    // Replace with your API Gateway Invoke URL
     const response = await axios.get(apiUrl+'/carbon-emission');
 
-    console.log('Data fetched from API:', response.data); // Change this line to log response.data instead of response
+    console.log('Data fetched from API:', response);
     res.send(response.data);
   } catch (error) {
     console.error('Error fetching data:', error);
     res.status(500).send('Error fetching data from DynamoDB');
   }
+}); */
+
+
+
+app.get('/lambda-test', async (req, res) => {
+  console.log("invoke")
+  const lambdaParams = {
+    FunctionName: 'getEvgoChargingStationLoc',
+    InvocationType: 'RequestResponse'
+  };
+
+  lambda.invoke(lambdaParams, (err, data) => {
+    if (err) {
+      console.error('Error invoking Lambda function:', err);
+      res.status(500).send('Error invoking Lambda function');
+    } else {
+      console.log('Lambda function invoked successfully:', data);
+      res.send(data.Payload);
+    }
+  });
+});
+app.get('/dynamodb-data', async (req, res) => {
+  const params = {
+    TableName: 'carbonEmission',
+  };
+
+  dynamoDB.scan(params, (err, data) => {
+    if (err) {
+      console.error('Error fetching data from DynamoDB', err);
+      res.status(500).send('Error fetching data from DynamoDB');
+    } else {
+      console.log('Data fetched from DynamoDB', data.Items);
+      res.send(data.Items);
+    }
+  });
 });
