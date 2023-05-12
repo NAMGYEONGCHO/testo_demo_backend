@@ -70,3 +70,14 @@ app.get('/dynamodb-data', async (req, res) => {
     }
   });
 });
+
+/* 
+  // fetch weather data
+   axios.get(`http://api.weatherstack.com/current?access_key=${process.env.API_KEY}&query=${process.env.LOCATION}`)
+  .then(response => {
+    console.log("weather");
+    console.log(response.data);
+  })
+  .catch(error => {
+    console.error(error);
+  }); */
