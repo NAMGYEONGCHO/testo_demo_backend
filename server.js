@@ -7,7 +7,6 @@ const bodyParser = require("body-parser");
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 const lambda = new AWS.Lambda();
 const { getDataFromDynamoDB } = require('./service');
-
 const app = express();
 const port = process.env.PORT || 3001;
 
@@ -81,3 +80,4 @@ app.get('/dynamodb-data', async (req, res) => {
   .catch(error => {
     console.error(error);
   }); */
+  
