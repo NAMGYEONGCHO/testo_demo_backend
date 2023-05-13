@@ -2,12 +2,12 @@ require('dotenv').config();
 const awsIot = require('aws-iot-device-sdk');
 
 const device = awsIot.device({
-    keyPath: process.env.KEY_PATH,
-    certPath: process.env.CERT_PATH,
-    caPath: process.env.CA_PATH,
-    clientId: process.env.CLIENT_ID,
-    host: process.env.HOST,
-    region: process.env.REGION
+    keyPath: './cert/f856a33b1596db51ab53644f0b0434419a6713c963a07b1b8d9a471be7ab2fe1-private.pem.key',
+    certPath: './cert/f856a33b1596db51ab53644f0b0434419a6713c963a07b1b8d9a471be7ab2fe1-certificate.pem.crt',
+    caPath: './cert/AmazonRootCA1.pem',
+    clientId: 'SimulatedTemperatureSensor',
+    host: 'a8p6smen58lcu-ats.iot.eu-north-1.amazonaws.com',
+    region: 'eu-north-1'
 });
 
 device.on('connect', function() {
@@ -15,7 +15,8 @@ device.on('connect', function() {
     setInterval(function() {
         const temperature = Math.floor(Math.random() * 100);
         const message = {
-            temperature: temperature
+            temperature: temperature,
+            clientType: "MQTT client"
         };
         device.publish('topic/temperature', JSON.stringify(message));
         console.log('Message Sent:', message);

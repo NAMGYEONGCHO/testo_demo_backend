@@ -54,6 +54,7 @@ app.get('/lambda-test', async (req, res) => {
     }
   });
 });
+
 app.get('/dynamodb-data', async (req, res) => {
   const params = {
     TableName: 'carbonEmission',
@@ -70,7 +71,7 @@ app.get('/dynamodb-data', async (req, res) => {
   });
 });
 
-/* 
+ /* 
   // fetch weather data
    axios.get(`http://api.weatherstack.com/current?access_key=${process.env.API_KEY}&query=${process.env.LOCATION}`)
   .then(response => {
@@ -79,5 +80,32 @@ app.get('/dynamodb-data', async (req, res) => {
   })
   .catch(error => {
     console.error(error);
-  }); */
+  });  */
   
+  
+  /** 
+   * Fetch weather data from external API. (weatherstack)
+   * store weather data in DynamoDB
+  */
+axios.get(`${process.env.WEATHER_STACK}?access_key=${process.env.API_KEY}&query=${process.env.LOCATION}`)
+.then(response => {
+
+  // Construct the payload for the Lambda function
+  const lambdaParams = {
+    FunctionName: 'WeatherData', 
+    Payload: JSON.stringify({ weatherData: response.data }),
+  };
+  console.log(lambdaParams);
+  // Invoke the Lambda function
+  lambda.invoke(lambdaParams, (err, data) => {
+    if (err) {
+      console.error('Error invoking Lambda function:', err);
+    } else {
+      console.log('Lambda function invoked successfully:', data);
+    }
+  });
+
+})
+.catch(error => {
+  console.error(error);
+});
