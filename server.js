@@ -71,6 +71,29 @@ app.get('/dynamodb-data', async (req, res) => {
   });
 });
 
+/** 
+   * Fetch weather data in DynamoDB using lambda function 
+   * 
+  */
+app.get('/weather-data', async (req, res) => {
+    const params = {
+        FunctionName: 'GetWeatherData', 
+        InvocationType: 'RequestResponse'
+    };
+
+    lambda.invoke(params, (err, data) => {
+        if (err) {
+            console.error('Error invoking Lambda function:', err);
+            res.status(500).send('Error invoking Lambda function');
+        } else {
+            console.log('Lambda function invoked successfully:', data);
+            // AWS Lambda uses JSON strings for payloads, so we need to parse the data
+            res.send(JSON.parse(data.Payload));
+        }
+    });
+});
+
+
  /* 
   // fetch weather data
    axios.get(`http://api.weatherstack.com/current?access_key=${process.env.API_KEY}&query=${process.env.LOCATION}`)
@@ -87,7 +110,7 @@ app.get('/dynamodb-data', async (req, res) => {
    * Fetch weather data from external API. (weatherstack)
    * store weather data in DynamoDB
   */
-axios.get(`${process.env.WEATHER_STACK}?access_key=${process.env.API_KEY}&query=${process.env.LOCATION}`)
+/* axios.get(`${process.env.WEATHER_STACK}?access_key=${process.env.API_KEY}&query=${process.env.LOCATION}`)
 .then(response => {
 
   // Construct the payload for the Lambda function
@@ -108,4 +131,4 @@ axios.get(`${process.env.WEATHER_STACK}?access_key=${process.env.API_KEY}&query=
 })
 .catch(error => {
   console.error(error);
-});
+});  */
